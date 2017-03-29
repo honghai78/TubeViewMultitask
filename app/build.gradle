@@ -1,0 +1,42 @@
+buildscript {
+    repositories {
+    }
+
+    dependencies {
+    }
+}
+apply plugin: 'com.android.application'
+
+repositories {
+}
+
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion '25.0.0'
+
+    defaultConfig {
+        generatedDensities = []
+        applicationId "shine.tran.tubeviewmultitask"
+        minSdkVersion 21
+        targetSdkVersion 23
+        versionCode 3
+        versionName "0.95"
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            useProguard true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.android.support:appcompat-v7:23.2.0'
+    compile 'com.android.support:design:23.2.0'
+    compile 'com.android.support:support-v4:23.2.0'
+//    compile 'com.android.volley:volley:1.0.0'
+    compile 'eu.the4thfloor.volley:com.android.volley:2015.05.28'
+}
