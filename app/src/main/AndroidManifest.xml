@@ -38,9 +38,11 @@
         <activity
             android:name=".GetPermission"
             android:parentActivityName=".YTubeView"
+            android:hardwareAccelerated="true"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".YTubeView"
+            android:hardwareAccelerated="true"
             android:label="@string/add_ytube"
             android:theme="@android:style/Theme.NoDisplay">
             <intent-filter>
@@ -80,6 +82,7 @@
             android:label="@string/title_activity_settings"
             android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
+            android:hardwareAccelerated="true"
             android:name=".FullscreenWebPlayer"
             android:excludeFromRecents="true"
             android:screenOrientation="landscape"
@@ -90,6 +93,7 @@
             android:theme="@style/Theme.AppCompat.Light.Dialog.Alert" />
 
         <service
+            android:hardwareAccelerated="true"
             android:name=".PlayerService"
             android:exported="true" />
     </application>

@@ -279,10 +279,23 @@ public class PlayerService extends Service implements View.OnClickListener{
             if(FullscreenWebPlayer.active){
                 FullscreenWebPlayer.fullScreenAct.onBackPressed();
             }
-            windowManager.removeView(playerView);
+//            windowManager.removeView(playerView);
+//            windowManager.removeView(serviceHead);
+//            windowManager.removeView(serviceClose);
+
+            //remove view
             windowManager.removeView(serviceHead);
+            servHeadParams = (WindowManager.LayoutParams) serviceHead.getLayoutParams();
             windowManager.removeView(serviceClose);
+            servCloseParams = (WindowManager.LayoutParams) serviceClose.getLayoutParams();
+            windowManager.removeView(serviceCloseBackground);
+            servCloseBackParams = (WindowManager.LayoutParams) serviceCloseBackground.getLayoutParams();
+            windowManager.removeView(playerView);
+            playerViewParams = (WindowManager.LayoutParams) playerView.getLayoutParams();
             webPlayer.destroy();
+            viewToHide.removeAllViews();
+
+
             //Show Rate or Star
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getAppContext());
             int val =  sharedPreferences.getInt(getString(R.string.count), 5);
@@ -296,7 +309,7 @@ public class PlayerService extends Service implements View.OnClickListener{
                 editor.putInt(getString(R.string.count), val);
                 editor.commit();
                 if (val == 0) {
-                    startActivity(new Intent(getAppContext(), RateOrStar.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                   // startActivity(new Intent(getAppContext(), RateOrStar.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                 }
             }
         }
@@ -421,10 +434,11 @@ public class PlayerService extends Service implements View.OnClickListener{
         webPlayerFrame = (FrameLayout) playerView.findViewById(R.id.web_player_frame);
         webPlayerLL = (LinearLayout) playerView.findViewById(R.id.web_player_ll);
 
-        webPlayer = new WebPlayer(this);
+        webPlayer = WebPlayer.getWebViewPlayer(this);
         webPlayer.setupPlayer();
 
-        viewToHide.addView(webPlayer.getPlayer(), parWebView);
+        View playerViewTemp = webPlayer.getPlayer();
+        viewToHide.addView(playerViewTemp, parWebView);
 
         //------------------------------Got Player Id--------------------------------------------------------
         Map hashMap = new HashMap();
@@ -775,7 +789,7 @@ public class PlayerService extends Service implements View.OnClickListener{
                 Log.d("Clicked", "Click!");
                 if (visible) {
                     //Make head sticky with the edge so update head params
-                    updateHead = true;
+                   // updateHead = true;
                     hidePlayer();
                 } else {
                    showPlayer();

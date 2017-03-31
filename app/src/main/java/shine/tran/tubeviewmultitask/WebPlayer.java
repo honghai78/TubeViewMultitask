@@ -16,11 +16,18 @@ import java.util.Map;
 public class WebPlayer {
 
     static WebView player;
-    Context context;
-
+    static Context context;
+    static WebPlayer webPlayer;
     public WebPlayer(Context context) {
         this.player = new WebView(context);
         this.context = context;
+    }
+
+    public static WebPlayer getWebViewPlayer(Context c){
+        if(webPlayer == null){
+            webPlayer = new WebPlayer(c);
+        }
+        return webPlayer;
     }
 
     public void setupPlayer() {
@@ -64,6 +71,7 @@ public class WebPlayer {
 
     public void destroy() {
         player.destroy();
+        webPlayer = null;
     }
 
     public void loadDataWithUrl(String baseUrl, String videoHTML, String mimeType, String encoding, String historyUrl) {

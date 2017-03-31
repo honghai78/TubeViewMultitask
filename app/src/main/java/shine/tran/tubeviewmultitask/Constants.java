@@ -63,13 +63,13 @@ public class Constants {
 
     //Actions
     public interface ACTION {
-        public static String PREV_ACTION = "com.shapps.ytube.action.prev";
-        public static String PAUSE_PLAY_ACTION = "com.shapps.ytube.action.play";
-        public static String NEXT_ACTION = "com.shapps.ytube.action.next";
-        public static String STARTFOREGROUND_WEB_ACTION = "com.shapps.ytube.action.playingweb";
-        public static String STOPFOREGROUND_WEB_ACTION = "com.shapps.ytube.action.stopplayingweb";
-        public static String STARTFOREGROUND_YTUBE_ACTION = "com.shapps.ytube.action.playingytube";
-        public static String STOPFOREGROUND_YTUBE_ACTION = "com.shapps.ytube.action.stopplayingytube";
+        public static String PREV_ACTION = "shine.tran.tubeviewmultitask.action.prev";
+        public static String PAUSE_PLAY_ACTION = "shine.tran.tubeviewmultitask.action.play";
+        public static String NEXT_ACTION = "shine.tran.tubeviewmultitask.action.next";
+        public static String STARTFOREGROUND_WEB_ACTION = "shine.tran.tubeviewmultitask.action.playingweb";
+        public static String STOPFOREGROUND_WEB_ACTION = "shine.tran.tubeviewmultitask.action.stopplayingweb";
+        public static String STARTFOREGROUND_YTUBE_ACTION = "shine.tran.tubeviewmultitask.action.playingytube";
+        public static String STOPFOREGROUND_YTUBE_ACTION = "shine.tran.tubeviewmultitask.action.stopplayingytube";
     }
 
     //Notification Id
