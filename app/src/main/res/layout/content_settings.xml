@@ -92,13 +92,15 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="30dp">
+
             <TextView
-                android:layout_weight="1"
+                android:id="@+id/textView2"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Video Quality"
                 android:textColor="#353535"
-                android:textSize="15dp"
-                android:text="Video Quality"/>
+                android:textSize="15dp" />
 
             <TextView
                 android:id="@+id/text_view_quality"
@@ -107,6 +109,33 @@
                 android:textSize="15dp"
                 android:layout_height="match_parent"
                 android:text="1080p"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="2dp"
+            android:gravity="center_vertical"
+            android:weightSum="1"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="30dp">
+            <TextView
+                android:layout_gravity="center|left"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:textColor="#353535"
+                android:textSize="15dp"
+                android:text="Auto play in floating"/>
+            <LinearLayout
+                android:gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <CheckBox
+                    android:id="@+id/autoFloating"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 
@@ -237,15 +266,23 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:layout_width="match_parent"
+        android:weightSum="1"
         android:layout_height="30dp">
         <TextView
-            android:layout_weight="3"
+            android:layout_weight="1"
             android:gravity="center|left"
-            android:layout_width="match_parent"
+            android:layout_width="0px"
             android:layout_height="match_parent"
             android:textColor="#353535"
             android:textSize="15dp"
             android:text="About"/>
+        <TextView
+            android:gravity="center|left"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textColor="#353535"
+            android:textSize="15dp"
+            android:text=""/>
     </LinearLayout>
 
 

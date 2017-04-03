@@ -29,33 +29,34 @@ public class Constants {
     //4 = medium(360p)
     //5 = small(240p)
     //6 = tiny(144p)
-    public  static  int playbackQuality = 3;
+    public  static  int playbackQuality = 0;
     //Finish service on end video
     public static boolean finishOnEnd = false;
+    public static boolean autoFloating = false;
 
 
-    private static String strPlaybackQuality = "large";
+    private static String strPlaybackQuality = "Auto";
     public static String getPlaybackQuality() {
         if(playbackQuality == 0){
-            strPlaybackQuality = "auto";
+            strPlaybackQuality = "Auto";
         }
         else if (playbackQuality == 1){
-            strPlaybackQuality = "hd1080";
+            strPlaybackQuality = "HD1080";
         }
         else if (playbackQuality == 2){
-            strPlaybackQuality = "hd720";
+            strPlaybackQuality = "HD720";
         }
         else if (playbackQuality == 3){
-            strPlaybackQuality = "large";
+            strPlaybackQuality = "Large";
         }
         else if (playbackQuality == 4){
-            strPlaybackQuality = "medium";
+            strPlaybackQuality = "Medium";
         }
         else if (playbackQuality == 5){
-            strPlaybackQuality = "small";
+            strPlaybackQuality = "Small";
         }
         else{
-            strPlaybackQuality = "tiny";
+            strPlaybackQuality = "Tiny";
         }
         return strPlaybackQuality;
     }
@@ -76,5 +77,7 @@ public class Constants {
     public interface NOTIFICATION_ID {
         public static int FOREGROUND_SERVICE = 101;
     }
-
+    static final public String RESULT = "shine.tran.tubeviewmultitask.Service.REQUEST_PROCESSED";
+    static final public String MESSAGE = "shine.tran.tubeviewmultitask.Service.MSG";
+    static final public String SEND_BACK_PLAYER = "shine.tran.tubeviewmultitask.Service.SEND";
 }

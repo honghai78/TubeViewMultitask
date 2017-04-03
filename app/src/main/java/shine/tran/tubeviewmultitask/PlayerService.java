@@ -8,6 +8,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
@@ -18,6 +19,7 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
@@ -63,6 +65,7 @@ public class PlayerService extends Service implements View.OnClickListener{
     static WebPlayer webPlayer;
     static String VID_ID = "";
     static String PLIST_ID = "";
+    static boolean LAYOUT_VIEW = false;
     static boolean isVideoPlaying = true;
     boolean visible = true;
     static RemoteViews viewBig;
@@ -72,7 +75,7 @@ public class PlayerService extends Service implements View.OnClickListener{
     static ImageView playerHeadImage;
     int playerHeadCenterX, playerHeadCenterY, closeMinX, closeMinY, closeMaxX, closeImgSize;
     int scrnWidth, scrnHeight, defaultPlayerWidth,playerWidth, playerHeight, playerHeadSize, closeImageLayoutSize, xAtHiding, yAtHiding, xOnAppear, yOnAppear = 0;
-
+    boolean turnOffWebView = false;
     static Intent fullScreenIntent;
 
     //is inside the close button so to stop video
@@ -266,24 +269,7 @@ public class PlayerService extends Service implements View.OnClickListener{
                 nextVid = true;
             }
         }
-
-        return START_NOT_STICKY;
-    }
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        isVideoPlaying = true;
-        Constants.linkType = 0;
-        Log.i("Status", "Destroyed!");
-        if (playerView != null) {
-            if(FullscreenWebPlayer.active){
-                FullscreenWebPlayer.fullScreenAct.onBackPressed();
-            }
-//            windowManager.removeView(playerView);
-//            windowManager.removeView(serviceHead);
-//            windowManager.removeView(serviceClose);
-
-            //remove view
+        if(!LAYOUT_VIEW && !turnOffWebView){
             windowManager.removeView(serviceHead);
             servHeadParams = (WindowManager.LayoutParams) serviceHead.getLayoutParams();
             windowManager.removeView(serviceClose);
@@ -292,26 +278,64 @@ public class PlayerService extends Service implements View.OnClickListener{
             servCloseBackParams = (WindowManager.LayoutParams) serviceCloseBackground.getLayoutParams();
             windowManager.removeView(playerView);
             playerViewParams = (WindowManager.LayoutParams) playerView.getLayoutParams();
-            webPlayer.destroy();
             viewToHide.removeAllViews();
+            turnOffWebView = true;
+            sendResult("OK");
+        }
+        return START_NOT_STICKY;
+    }
 
+    public void sendResult(String message) {
+        Intent intent = new Intent(Constants.RESULT);
+        if(message != null)
+            intent.putExtra(Constants.MESSAGE, message);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
 
-            //Show Rate or Star
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getAppContext());
-            int val =  sharedPreferences.getInt(getString(R.string.count), 5);
-            Log.d("Current Count is ", String.valueOf(val));
-            if(val < 15) {
-                val += 1;
-                if (val > 4) {
-                    val = 0;
-                }
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putInt(getString(R.string.count), val);
-                editor.commit();
-                if (val == 0) {
-                   // startActivity(new Intent(getAppContext(), RateOrStar.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-                }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        isVideoPlaying = true;
+        Constants.linkType = 0;
+        Log.i("Status", "Destroyed!");
+        if (playerView != null && !turnOffWebView) {
+            if(FullscreenWebPlayer.active){
+                FullscreenWebPlayer.fullScreenAct.onBackPressed();
             }
+//            windowManager.removeView(playerView);
+//            windowManager.removeView(serviceHead);
+//            windowManager.removeView(serviceClose);
+
+            //remove view
+                windowManager.removeView(serviceHead);
+                servHeadParams = (WindowManager.LayoutParams) serviceHead.getLayoutParams();
+                windowManager.removeView(serviceClose);
+                servCloseParams = (WindowManager.LayoutParams) serviceClose.getLayoutParams();
+                windowManager.removeView(serviceCloseBackground);
+                servCloseBackParams = (WindowManager.LayoutParams) serviceCloseBackground.getLayoutParams();
+                windowManager.removeView(playerView);
+                playerViewParams = (WindowManager.LayoutParams) playerView.getLayoutParams();
+                webPlayer.destroy();
+                viewToHide.removeAllViews();
+                //Show Rate or Star
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getAppContext());
+                int val =  sharedPreferences.getInt(getString(R.string.count), 5);
+                Log.d("Current Count is ", String.valueOf(val));
+                if(val < 15) {
+                    val += 1;
+                    if (val > 4) {
+                        val = 0;
+                    }
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putInt(getString(R.string.count), val);
+                    editor.commit();
+                    if (val == 0) {
+                        // startActivity(new Intent(getAppContext(), RateOrStar.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                    }
+                }
+        }
+        else {
+            webPlayer.destroy();
         }
     }
 
@@ -337,6 +361,7 @@ public class PlayerService extends Service implements View.OnClickListener{
         if (b != null) {
             PlayerService.VID_ID = b.getString("VID_ID");
             PlayerService.PLIST_ID = b.getString("PLAYLIST_ID");
+            PlayerService.LAYOUT_VIEW = b.getBoolean("LAYOUT_VIEW");
         }
 
         //Notification

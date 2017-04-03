@@ -3,9 +3,13 @@ package shine.tran.tubeviewmultitask;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.SearchManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.graphics.Bitmap;
@@ -19,6 +23,10 @@ import android.os.Handler;
 import android.provider.Settings;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -27,9 +35,9 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.webkit.WebResourceRequest;
@@ -45,8 +53,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonArrayRequest;
-import shine.tran.tubeviewmultitask.CustomViews.CustomSwipeRefresh;
-import shine.tran.tubeviewmultitask.CustomVolley.AppController;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -55,11 +61,17 @@ import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import shine.tran.tubeviewmultitask.CustomViews.CustomSwipeRefresh;
+import shine.tran.tubeviewmultitask.CustomVolley.AppController;
+
 public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
-private static String TAG = "MAIN";
+    private static String TAG = "MAIN";
     Activity mainAct;
     WebView youtubeView;
     String currUrl;
+    boolean onrotaion = true;
     boolean doubleClickToExit = false;
     //For Result Activity
     public static int OVERLAY_PERMISSION_REQ = 1234;
@@ -73,7 +85,9 @@ private static String TAG = "MAIN";
     Button retry, changeSettings, exitApp;
 
     ViewStub viewStub;
-
+    SharedPreferences sharedPref;
+    boolean autoFloating = false;
+    BroadcastReceiver receiver;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -81,11 +95,11 @@ private static String TAG = "MAIN";
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        ButterKnife.bind(this);
         viewStub = (ViewStub) findViewById(R.id.view_stub);
-
-
-        if(isInternetAvailable(mainAct)) {
+        sharedPref = getApplicationContext().getSharedPreferences(getString(R.string.FileName), Context.MODE_PRIVATE);
+        autoFloating = sharedPref.getBoolean(getString(R.string.autoFloating), false);
+        if (isInternetAvailable(mainAct)) {
 
             viewStub.setLayoutResource(R.layout.content_main);
             viewStub.inflate();
@@ -138,7 +152,7 @@ private static String TAG = "MAIN";
                     Log.d(TAG + "Main Page Finished", str);
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                         String url = String.valueOf(str);
-                        openViewPlayer(url);
+                        selectionOpenTypeMode(url);
                     }
                 }
 
@@ -163,7 +177,7 @@ private static String TAG = "MAIN";
                 public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         String url = String.valueOf(request.getUrl());
-                        openViewPlayer(url);
+                        selectionOpenTypeMode(url);
                     }
                     return super.shouldInterceptRequest(view, request);
                 }
@@ -171,8 +185,7 @@ private static String TAG = "MAIN";
             youtubeView.canGoBack();
             currUrl = "https://m.youtube.com/";
             youtubeView.loadUrl(currUrl);
-        }
-        else{
+        } else {
 
             viewStub.setLayoutResource(R.layout.content_main_no_internet);
             viewStub.inflate();
@@ -200,7 +213,23 @@ private static String TAG = "MAIN";
                 }
             });
         }
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String s = intent.getStringExtra(Constants.MESSAGE);
+               Log.e("TAG", s);
+
+                if (!autoFloating) {
+                    Fragment fr = VideoPlayerFragment.newInstance();
+                    FragmentManager fm = getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction = fm.beginTransaction();
+                    fragmentTransaction.add(R.id.fragment, fr);
+                    fragmentTransaction.commit();
+                }
+            }
+        };
     }
+
     private boolean isServiceRunning(Class<PlayerService> playerServiceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
@@ -210,6 +239,7 @@ private static String TAG = "MAIN";
         }
         return false;
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -226,17 +256,17 @@ private static String TAG = "MAIN";
                     startService(i);
                 }
             }
-        }
-        else if(requestCode == 0) {
+        } else if (requestCode == 0) {
             mainAct.recreate();
         }
     }
+
     private void needPermissionDialog(final int requestCode) {
-        if(requestCode == OVERLAY_PERMISSION_REQ) {
+        if (requestCode == OVERLAY_PERMISSION_REQ) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage("You need to grant the permission.");
             builder.setPositiveButton("OK",
-                    new android.content.DialogInterface.OnClickListener() {
+                    new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             // TODO Auto-generated method stub
@@ -245,7 +275,7 @@ private static String TAG = "MAIN";
                             startActivityForResult(i, OVERLAY_PERMISSION_REQ);
                         }
                     });
-            builder.setNegativeButton("Cancel", new android.content.DialogInterface.OnClickListener() {
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     // TODO Auto-generated method stub
@@ -256,6 +286,7 @@ private static String TAG = "MAIN";
             builder.show();
         }
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -265,7 +296,7 @@ private static String TAG = "MAIN";
                 (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView =
                 (SearchView) menu.findItem(R.id.search).getActionView();
-        if(searchView != null){
+        if (searchView != null) {
             searchView.setSearchableInfo(
                     searchManager.getSearchableInfo(getComponentName()));
             searchView.setOnQueryTextListener(this);
@@ -289,14 +320,15 @@ private static String TAG = "MAIN";
 
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     public void onBackPressed() {
-        if(exit){
+        if (exit) {
             super.onBackPressed();
             return;
         }
         Log.d(TAG + "Curr Url", currUrl);
-        if(currUrl.equals("https://m.youtube.com/")) {
+        if (currUrl.equals("https://m.youtube.com/")) {
             if (doubleClickToExit) {
                 super.onBackPressed();
                 return;
@@ -312,8 +344,7 @@ private static String TAG = "MAIN";
                     doubleClickToExit = false;
                 }
             }, 2000);
-        }
-        else {
+        } else {
             youtubeView.goBack();
         }
     }
@@ -323,16 +354,14 @@ private static String TAG = "MAIN";
                 context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
 
         if (info == null) {
-            Log.d(TAG + "Network Test","no internet connection");
+            Log.d(TAG + "Network Test", "no internet connection");
             return false;
-        }
-        else {
-            if(info.isConnected()) {
-                Log.d(TAG + "Network Test"," internet connection available...");
+        } else {
+            if (info.isConnected()) {
+                Log.d(TAG + "Network Test", " internet connection available...");
                 return true;
-            }
-            else {
-                Log.d(TAG + "Network Test"," internet connection");
+            } else {
+                Log.d(TAG + "Network Test", " internet connection");
                 return true;
             }
         }
@@ -340,13 +369,14 @@ private static String TAG = "MAIN";
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        youtubeView.loadUrl("http://m.youtube.com/results?q="+ query);
+        youtubeView.loadUrl("http://m.youtube.com/results?q=" + query);
         searchView.clearFocus();
         return true;
     }
+
     @Override
     public boolean onQueryTextChange(String newText) {
-        if(newText.length() > 0) {
+        if (newText.length() > 0) {
             newText = newText.replace(" ", "+");
             String url = "http://suggestqueries.google.com/complete/search?client=youtube&ds=yt&client=firefox&q="
                     + newText;
@@ -423,7 +453,13 @@ private static String TAG = "MAIN";
         }
         return true;
     }
-    private void openViewPlayer(String url){
+
+    private void selectionOpenTypeMode(String url) {
+        autoFloating = sharedPref.getBoolean(getString(R.string.autoFloating), false);
+        openViewPlayer(url, autoFloating);
+    }
+
+    private void openViewPlayer(String url, final boolean view) {
         if (String.valueOf(url).contains("http://m.youtube.com/watch?") ||
                 String.valueOf(url).contains("https://m.youtube.com/watch?")) {
             Log.d(TAG + "Yay Catches!!!! ", url);
@@ -468,6 +504,7 @@ private static String TAG = "MAIN";
                             Intent i = new Intent(MainActivity.this, PlayerService.class);
                             i.putExtra("VID_ID", VID);
                             i.putExtra("PLAYLIST_ID", finalPID);
+                            i.putExtra("LAYOUT_VIEW", view);
                             i.setAction(Constants.ACTION.STARTFOREGROUND_WEB_ACTION);
                             startService(i);
                         }
@@ -482,5 +519,18 @@ private static String TAG = "MAIN";
                 }
             });
         }
+    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        LocalBroadcastManager.getInstance(this).registerReceiver((receiver),
+                new IntentFilter(Constants.RESULT)
+        );
+    }
+
+    @Override
+    protected void onStop() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+        super.onStop();
     }
 }

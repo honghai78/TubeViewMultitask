@@ -31,7 +31,7 @@ public class ConstantStrings {
                 "  <body>\n" +
                 "    <iframe style=\"display: block;\" id=\"player\" frameborder=\"0\"  width=\"100%\" height=\"100%\" " +
                 "       src=\"https://www.youtube.com/embed/" + VID +
-                       "?enablejsapi=1&autoplay=1&iv_load_policy=3&fs=0&rel=0\">" +
+                       "?enablejsapi=1&autoplay=1&showinfo=0&iv_load_policy=3&fs=0&rel=0\">" +
                 "    </iframe>\n" +
                 "    <script type=\"text/javascript\">\n" +
                 "      var tag = document.createElement('script');\n" +

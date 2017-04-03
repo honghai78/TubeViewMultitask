@@ -13,7 +13,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.KeyCharacterMap;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -35,6 +34,8 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     SharedPreferences sharedPref;
     @BindView(R.id.textVersion)
     TextView textVersion;
+    @BindView(R.id.autoFloating)
+    CheckBox autoFloating;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,16 +50,17 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 
         sharedPref = getApplicationContext().getSharedPreferences(getString(R.string.FileName), Context.MODE_PRIVATE);
 
-        Constants.playbackQuality = sharedPref.getInt(getString(R.string.videoQuality), 3);
+        Constants.playbackQuality = sharedPref.getInt(getString(R.string.videoQuality), 0);
 
         stopNotPlaying.setChecked(sharedPref.getBoolean(getString(R.string.finishOnEnd), false));
+        autoFloating.setChecked(sharedPref.getBoolean(getString(R.string.autoFloating), false));
         quality.setText(Constants.getPlaybackQuality());
 
         videoQuality.setOnClickListener(this);
-     //   playerType.setOnClickListener(this);
+        //   playerType.setOnClickListener(this);
         about.setOnClickListener(this);
-       // increaseCount.setOnClickListener(this);
-       // decreaseCount.setOnClickListener(this);
+        // increaseCount.setOnClickListener(this);
+        // decreaseCount.setOnClickListener(this);
         fullscreenOnRotate.setOnClickListener(this);
 
         stopNotPlaying.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -72,11 +74,21 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                 }
             }
         });
+        autoFloating.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked == true || isChecked == false) {
+                    Constants.autoFloating = isChecked;
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putBoolean(getString(R.string.autoFloating), isChecked);
+                    editor.commit();
+                }
+            }
+        });
         try {
             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             textVersion.setText(pInfo.versionName);
-        }
-        catch (PackageManager.NameNotFoundException n){
+        } catch (PackageManager.NameNotFoundException n) {
             textVersion.setText("Unknown");
         }
 
@@ -108,7 +120,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                     }
                 });
                 String[] items = {"Auto", "1080p", "720p", "480p", "360p", "240p", "144p"};
-                checked[0] = sharedPref.getInt(getString(R.string.videoQuality), 3);
+                checked[0] = sharedPref.getInt(getString(R.string.videoQuality), 0);
                 Log.d("Old Quality", Constants.getPlaybackQuality());
                 builder.setSingleChoiceItems(items, checked[0], new DialogInterface.OnClickListener() {
                     @Override
