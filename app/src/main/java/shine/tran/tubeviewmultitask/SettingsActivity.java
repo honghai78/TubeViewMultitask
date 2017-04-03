@@ -3,16 +3,17 @@ package shine.tran.tubeviewmultitask;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyCharacterMap;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -21,7 +22,10 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class SettingsActivity extends AppCompatActivity implements View.OnClickListener{
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+public class SettingsActivity extends AppCompatActivity implements View.OnClickListener {
 
     LinearLayout videoQuality, playerType, about;
     Button increaseCount, decreaseCount;
@@ -29,18 +33,21 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     CoordinatorLayout coordinatorLayout;
     TextView quality;
     SharedPreferences sharedPref;
+    @BindView(R.id.textVersion)
+    TextView textVersion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         initViews();
 
-        sharedPref = getApplicationContext().getSharedPreferences(getString(R.string.FileName) ,Context.MODE_PRIVATE);
+        sharedPref = getApplicationContext().getSharedPreferences(getString(R.string.FileName), Context.MODE_PRIVATE);
 
         Constants.playbackQuality = sharedPref.getInt(getString(R.string.videoQuality), 3);
 
@@ -48,10 +55,10 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         quality.setText(Constants.getPlaybackQuality());
 
         videoQuality.setOnClickListener(this);
-        playerType.setOnClickListener(this);
+     //   playerType.setOnClickListener(this);
         about.setOnClickListener(this);
-        increaseCount.setOnClickListener(this);
-        decreaseCount.setOnClickListener(this);
+       // increaseCount.setOnClickListener(this);
+       // decreaseCount.setOnClickListener(this);
         fullscreenOnRotate.setOnClickListener(this);
 
         stopNotPlaying.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -65,6 +72,13 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                 }
             }
         });
+        try {
+            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            textVersion.setText(pInfo.versionName);
+        }
+        catch (PackageManager.NameNotFoundException n){
+            textVersion.setText("Unknown");
+        }
 
     }
 
@@ -78,7 +92,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.video_quality:
                 final int[] checked = new int[1];
                 AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
@@ -96,7 +110,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                 String[] items = {"Auto", "1080p", "720p", "480p", "360p", "240p", "144p"};
                 checked[0] = sharedPref.getInt(getString(R.string.videoQuality), 3);
                 Log.d("Old Quality", Constants.getPlaybackQuality());
-                builder.setSingleChoiceItems(items, checked[0], new DialogInterface.OnClickListener(){
+                builder.setSingleChoiceItems(items, checked[0], new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int ith) {
                         checked[0] = ith;
@@ -123,10 +137,10 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         quality = (TextView) findViewById(R.id.text_view_quality);
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
         videoQuality = (LinearLayout) findViewById(R.id.video_quality);
-        playerType = (LinearLayout) findViewById(R.id.player_type);
+//        playerType = (LinearLayout) findViewById(R.id.player_type);
         about = (LinearLayout) findViewById(R.id.about);
-        increaseCount = (Button) findViewById(R.id.increase_repeat_count);
-        decreaseCount = (Button) findViewById(R.id.decrease_repeat_count);
+//        increaseCount = (Button) findViewById(R.id.increase_repeat_count);
+//        decreaseCount = (Button) findViewById(R.id.decrease_repeat_count);
         fullscreenOnRotate = (CheckBox) findViewById(R.id.fullscreen_on_rotate);
         stopNotPlaying = (CheckBox) findViewById(R.id.stop_not_playing);
     }
