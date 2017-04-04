@@ -223,14 +223,14 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                     Fragment fr = VideoPlayerFragment.newInstance();
                     FragmentManager fm = getSupportFragmentManager();
                     FragmentTransaction fragmentTransaction = fm.beginTransaction();
-                    fragmentTransaction.replace(R.id.fragment, fr);
+                    fragmentTransaction.replace(R.id.fragment, fr, Constants.TAG_FR);
                     fragmentTransaction.commit();
                 }
             }
         };
     }
 
-    private boolean isServiceRunning(Class<PlayerService> playerServiceClass) {
+    public boolean isServiceRunning(Class<PlayerService> playerServiceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if (playerServiceClass.getName().equals(service.service.getClassName())) {
@@ -535,5 +535,19 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     protected void onStop() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
         super.onStop();
+    }
+
+    public void removeFragmentUrlCommit(String VID){
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(Constants.TAG_FR);
+        if(fragment != null)
+            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+        this.VID = VID;
+        autoFloating = sharedPref.getBoolean(getString(R.string.autoFloating), false);
+        Intent i = new Intent(MainActivity.this, PlayerService.class);
+        i.putExtra("VID_ID", this.VID);
+        i.putExtra("PLAYLIST_ID", PID);
+        i.putExtra("LAYOUT_VIEW", autoFloating);
+        i.setAction(Constants.ACTION.STARTFOREGROUND_WEB_ACTION);
+        startService(i);
     }
 }

@@ -2,10 +2,13 @@ package shine.tran.tubeviewmultitask;
 
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,6 +36,7 @@ import butterknife.Unbinder;
  * create an instance of this fragment.
  */
 public class ListFragment extends Fragment {
+    private String TAG = ListFragment.class.getSimpleName();
     @BindView(R.id.webview)
     WebView webView;
     Unbinder unbinder;
@@ -79,9 +83,9 @@ public class ListFragment extends Fragment {
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
             }
+
             @Override
             public void onPageCommitVisible(WebView view, String url) {
-                setup();
                 super.onPageCommitVisible(view, url);
             }
 
@@ -89,17 +93,66 @@ public class ListFragment extends Fragment {
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 Log.e("TAG", "Finnist");
-                    setup();
-                    WebPlayer.loadScript(JavaScript.playVideoScript());
-                    if (progressDialog.isShowing())
-                        progressDialog.dismiss();
+                setup();
+                WebPlayer.loadScript(JavaScript.playVideoScript());
+                if (progressDialog.isShowing())
+                    progressDialog.dismiss();
+            }
+
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    String url = String.valueOf(request.getUrl());
+                    if (String.valueOf(url).contains("http://m.youtube.com/watch?") ||
+                            String.valueOf(url).contains("https://m.youtube.com/watch?")) {
+                        Log.d(TAG + "Yay Catches!!!! ", url);
+                        url = String.valueOf(url);
+                        //Video Id
+                        int temp = url.indexOf("&v=");
+                        if(temp>0){
+                            VID = url.substring( temp + 3, url.length());
+                        }
+                        else {
+                            VID = ConstantStrings.VID;
+                        }
+                        Log.d(TAG + "VID ", VID);
+                        //Playlist Id
+                        temp = url.indexOf("&list=");
+                         String listID = "";
+                        if(temp>0){
+                          listID = url.substring(url.indexOf("&list=") + 6, url.length());
+                        }
+
+                        Pattern pattern = Pattern.compile(
+                                "([A-Za-z0-9_-]+)&[\\w]+=.*",
+                                Pattern.CASE_INSENSITIVE);
+                        Matcher matcher = pattern.matcher(listID.toString());
+                        Log.d(TAG + "ListID", listID);
+                        PID = "";
+                        if (matcher.matches()) {
+                            PID = matcher.group(1);
+                        }
+                        if (listID.contains("m.youtube.com")) {
+                            Log.d(TAG + "Not a ", "Playlist.");
+                            PID = null;
+                        } else {
+                            Constants.linkType = 1;
+                            Log.d(TAG + "PlaylistID ", PID);
+                        }
+                        if(!VID.equals(ConstantStrings.VID)){
+                            ((MainActivity)getActivity()).stopService();
+                           ((MainActivity)getActivity()).removeFragmentUrlCommit(VID);
+                        }
+                    }
+                }
+                return super.shouldInterceptRequest(view, request);
             }
         });
-        webView.setWebChromeClient(new WebChromeClient(){
+        webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
                 super.onProgressChanged(view, newProgress);
-                 setup();
+                setup();
                 WebPlayer.loadScript(JavaScript.playVideoScript());
             }
         });
@@ -107,6 +160,7 @@ public class ListFragment extends Fragment {
     }
 
     public void setup() {
+        if(webView!=null)
         webView.loadUrl("javascript:" + "setGround();\n" +
                 "                      function setGround() {\n" +
                 "                                var n1 = document.getElementById('player');\n" +

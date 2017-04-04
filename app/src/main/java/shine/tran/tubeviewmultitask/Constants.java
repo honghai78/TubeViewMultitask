@@ -80,4 +80,5 @@ public class Constants {
     static final public String RESULT = "shine.tran.tubeviewmultitask.Service.REQUEST_PROCESSED";
     static final public String MESSAGE = "shine.tran.tubeviewmultitask.Service.MSG";
     static final public String SEND_BACK_PLAYER = "shine.tran.tubeviewmultitask.Service.SEND";
+    static final public String TAG_FR = "shine.tran.tubeviewmultitask.Frantment_TAG";
 }
