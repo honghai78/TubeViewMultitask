@@ -1,6 +1,8 @@
 package shine.tran.tubeviewmultitask;
 
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -76,12 +78,14 @@ public class VideoPlayerFragment extends Fragment {
 
             @Override
             public void onClosedToLeft() {
-                ((MainActivity) getActivity()).onBackPressed();
+                ((MainActivity)getActivity()).stopService();
+                WebPlayer.getPlayer().destroy();
             }
 
             @Override
             public void onClosedToRight() {
-                ((MainActivity) getActivity()).onBackPressed();
+                ((MainActivity)getActivity()).stopService();
+                WebPlayer.getPlayer().destroy();
             }
         });
     }

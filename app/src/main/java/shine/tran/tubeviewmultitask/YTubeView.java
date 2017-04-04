@@ -8,13 +8,15 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatImageView;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class YTubeView extends Activity{//extends YouTubeFailureRecoveryActivity {
+public class YTubeView extends AppCompatActivity{//extends YouTubeFailureRecoveryActivity {
 
     //    YouTubePlayerView youTubeView;
     String vId, pId;

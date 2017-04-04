@@ -223,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                     Fragment fr = VideoPlayerFragment.newInstance();
                     FragmentManager fm = getSupportFragmentManager();
                     FragmentTransaction fragmentTransaction = fm.beginTransaction();
-                    fragmentTransaction.add(R.id.fragment, fr);
+                    fragmentTransaction.replace(R.id.fragment, fr);
                     fragmentTransaction.commit();
                 }
             }
@@ -238,6 +238,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             }
         }
         return false;
+    }
+    public void stopService(){
+        stopService(new Intent(this, PlayerService.class));
     }
 
     @Override
@@ -454,7 +457,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         return true;
     }
 
-    private void selectionOpenTypeMode(String url) {
+    public void selectionOpenTypeMode(String url) {
         autoFloating = sharedPref.getBoolean(getString(R.string.autoFloating), false);
         openViewPlayer(url, autoFloating);
     }

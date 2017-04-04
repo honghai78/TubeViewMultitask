@@ -23,8 +23,9 @@
         <RelativeLayout
             android:id="@+id/list_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@android:color/black">
+            android:layout_below="@+id/video_layout"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white">
             <fragment
                 android:name="shine.tran.tubeviewmultitask.ListFragment"
                 android:id="@+id/fragment_list"
@@ -34,7 +35,7 @@
         <RelativeLayout
             android:id="@+id/video_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/video_layout"
             android:background="@android:color/white">
             <fragment

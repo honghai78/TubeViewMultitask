@@ -42,7 +42,7 @@ public class WebPlayer {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             player.getSettings().setMediaPlaybackRequiresUserGesture(false);
         }
-        player.getSettings().setUserAgentString("Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:21.0.0) Gecko/20121011 Firefox/21.0.0");
+        player.getSettings().setUserAgentString("Android");
 
         //----------------------------To get Player Id-------------------------------------------
 
@@ -56,6 +56,7 @@ public class WebPlayer {
                                     @Override
                                     public void onPageFinished(WebView view, String url) {
                                         PlayerService.addStateChangeListener();
+                                        player.loadUrl(JavaScript.playVideoScript());
                                     }
                                 }
         );

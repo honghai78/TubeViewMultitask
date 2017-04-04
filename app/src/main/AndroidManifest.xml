@@ -43,7 +43,7 @@
             android:configChanges="orientation|keyboardHidden"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".YTubeView"
+            android:name="shine.tran.tubeviewmultitask.YTubeView"
             android:hardwareAccelerated="true"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/add_ytube"
