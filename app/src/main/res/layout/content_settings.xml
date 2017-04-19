@@ -283,7 +283,7 @@
             android:layout_height="match_parent"
             android:textColor="#353535"
             android:textSize="15dp"
-            android:text=""/>
+            android:text="Develop by Shine Tran - 2017"/>
     </LinearLayout>
 
 
