@@ -53,7 +53,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         Constants.playbackQuality = sharedPref.getInt(getString(R.string.videoQuality), 0);
 
         stopNotPlaying.setChecked(sharedPref.getBoolean(getString(R.string.finishOnEnd), false));
-        autoFloating.setChecked(sharedPref.getBoolean(getString(R.string.autoFloating), false));
+        autoFloating.setChecked(sharedPref.getBoolean(getString(R.string.autoFloating), true));
         quality.setText(Constants.getPlaybackQuality());
 
         videoQuality.setOnClickListener(this);

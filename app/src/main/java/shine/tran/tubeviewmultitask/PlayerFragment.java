@@ -13,6 +13,7 @@ import android.widget.RelativeLayout;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 
 
@@ -64,8 +65,8 @@ public class PlayerFragment extends Fragment {
         );
         View playerViewTemp = webPlayer.getPlayer();
         ViewGroup par = (ViewGroup) playerViewTemp.getParent();
-        if(par!=null)
-        par.removeView(playerViewTemp);
+        if (par != null)
+            par.removeView(playerViewTemp);
         layoutPlayer.addView(playerViewTemp, parWebView);
     }
 
@@ -74,10 +75,15 @@ public class PlayerFragment extends Fragment {
         super.onDestroyView();
         unbinder.unbind();
     }
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if(!FullscreenWebPlayer.active && getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+        fullScreen();
+    }
+
+    private void fullScreen() {
+        if (!FullscreenWebPlayer.active && getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             webPlayer.loadScript(JavaScript.pauseVideoScript());
             Intent fullScreenIntent = new Intent(getActivity(), FullscreenWebPlayer.class);
             fullScreenIntent.putExtra(Constants.SEND_BACK_PLAYER, true);
@@ -91,5 +97,26 @@ public class PlayerFragment extends Fragment {
         super.onResume();
         layoutPlayer.removeAllViews();
         init();
+    }
+
+    @OnClick(R.id.fullscreen)
+    public void fullScreenOnClick(View v) {
+        if (!FullscreenWebPlayer.active) {
+            webPlayer.loadScript(JavaScript.pauseVideoScript());
+            Intent fullScreenIntent = new Intent(getActivity(), FullscreenWebPlayer.class);
+            fullScreenIntent.putExtra(Constants.SEND_BACK_PLAYER, true);
+            fullScreenIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            getActivity().startActivity(fullScreenIntent);
+        }
+    }
+
+    @OnClick(R.id.entire_width)
+    public void floating(View v) {
+        Intent i = new Intent(getActivity(), PlayerService.class);
+        i.putExtra("VID_ID", ConstantStrings.VID);
+        i.putExtra("PLAYLIST_ID", ConstantStrings.PLIST);
+        i.putExtra("LAYOUT_VIEW", true);
+        i.setAction(Constants.ACTION.STARTFOREGROUND_WEB_ACTION);
+        getActivity().startService(i);
     }
 }

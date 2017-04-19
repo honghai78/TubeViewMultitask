@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         ButterKnife.bind(this);
         viewStub = (ViewStub) findViewById(R.id.view_stub);
         sharedPref = getApplicationContext().getSharedPreferences(getString(R.string.FileName), Context.MODE_PRIVATE);
-        autoFloating = sharedPref.getBoolean(getString(R.string.autoFloating), false);
+        autoFloating = sharedPref.getBoolean(getString(R.string.autoFloating), true);
         if (isInternetAvailable(mainAct)) {
 
             viewStub.setLayoutResource(R.layout.content_main);
@@ -458,7 +458,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     }
 
     public void selectionOpenTypeMode(String url) {
-        autoFloating = sharedPref.getBoolean(getString(R.string.autoFloating), false);
+        autoFloating = sharedPref.getBoolean(getString(R.string.autoFloating), true);
         openViewPlayer(url, autoFloating);
     }
 
@@ -542,7 +542,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         if(fragment != null)
             getSupportFragmentManager().beginTransaction().remove(fragment).commit();
         this.VID = VID;
-        autoFloating = sharedPref.getBoolean(getString(R.string.autoFloating), false);
+        autoFloating = sharedPref.getBoolean(getString(R.string.autoFloating), true);
         Intent i = new Intent(MainActivity.this, PlayerService.class);
         i.putExtra("VID_ID", this.VID);
         i.putExtra("PLAYLIST_ID", PID);

@@ -22,3 +22,5 @@ build/android-profile/profile-2017-03-31-17-36-19-719.rawproto
 build/android-profile/profile-2017-03-31-17-39-05-418.rawproto
 build/generated/mockable-android-25.jar
 build/intermediates/proguard-files/proguard-android-optimize.txt-2.3.0
+.idea/
+build/
