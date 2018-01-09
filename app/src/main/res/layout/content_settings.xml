@@ -258,7 +258,7 @@
             android:textColor="#353535"
             android:id="@+id/textVersion"
             android:textSize="15dp"
-            android:text="1.0"/>
+            android:text="1.1"/>
     </LinearLayout>
     <LinearLayout
         android:id="@+id/about"
@@ -283,7 +283,7 @@
             android:layout_height="match_parent"
             android:textColor="#353535"
             android:textSize="15dp"
-            android:text="Develop by Shine Tran - 2017"/>
+            android:text="Develop by Shine App - 2018"/>
     </LinearLayout>
 
 
